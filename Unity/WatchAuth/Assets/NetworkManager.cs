@@ -9,10 +9,12 @@ using System.Threading;
 
 public class NetworkManager : MonoBehaviour
 {
+
     static UdpClient srv;
     static UdpClient snd;
     static UdpClient srv_points;
     Thread thread;
+    Thread thread2;
     IPEndPoint remoteEP;
     IPEndPoint remoteEP_pt;
     static private AsyncCallback AC;
@@ -26,16 +28,21 @@ public class NetworkManager : MonoBehaviour
 
     void Start()
     {   
+
         srv=new UdpClient(5556);
-        snd=new UdpClient(5580);
         srv_points=new UdpClient(5566);
         remoteEP=new IPEndPoint(IPAddress.Any,0);
         remoteEP_pt=new IPEndPoint(IPAddress.Any,0);
         thread=new Thread(new ThreadStart(Udpreceive));
         thread.Start();
+        thread2=new Thread(new ThreadStart(Udpreceive_pt));
+        thread2.Start();
+
 
     }
     
+
+
     void Udpreceive(){
         while(true){
             lock(lockObject){
@@ -46,6 +53,25 @@ public class NetworkManager : MonoBehaviour
             }
         }
     }
+
+     void Udpreceive_pt(){
+        while(true){
+            lock(lockObject2){
+                byte[] dgram = srv_points.Receive(ref remoteEP_pt);
+                msgs=System.Text.Encoding.UTF8.GetString(dgram,0,dgram.Length);
+             
+            }
+        }
+    }
+
+     public string[] get_points(){
+        string[] points=msgs.Split(',');
+        msgs="";
+        return points;
+        
+    }
+
+
 
     public string GetLatestData()
         {
@@ -81,4 +107,5 @@ void OnApplicationQuit()
             srv_points.Close();
         }
     }
+
 }

@@ -72,7 +72,6 @@ public class UIManager: MonoBehaviour {
   void Update() {
 
     string latestData = nm.GetLatestData();
-    UnityEngine.Debug.Log(latestData);
     if (!string.IsNullOrEmpty(latestData)) {
       bool shouldUpdateUI = false;
 
