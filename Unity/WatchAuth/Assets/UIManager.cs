@@ -2,13 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 using System;
+using System.Diagnostics;
 
 public class UIManager: MonoBehaviour {
 
   const string PASSWORD = "3579";
 
-
+  private Stopwatch stopwatch = new Stopwatch();
   int correct = 0;
   int attempts = 0;
 
@@ -33,6 +35,8 @@ public class UIManager: MonoBehaviour {
   private string prevRem;
 
   private List < GameObject > instantiatedButtons = new List < GameObject > ();
+  public List <float> times = new List <float>();
+  public List <string> results = new List <string>();
 
 
 
@@ -43,21 +47,45 @@ public class UIManager: MonoBehaviour {
       bool shouldUpdateUI = false;
 
       if (latestData.StartsWith("[")) {
+        if (!stopwatch.IsRunning)
+            {
+                stopwatch.Start();
+            }
         elementsList.Clear();
         AddElementsToList(latestData);
         shouldUpdateUI = true; 
        
 
 
-        if (userEntry == PASSWORD) {
-          Debug.Log("Correct");
-          correct++;
-        } 
+     
  
     if (userEntry.Length > 0) {
-          Debug.Log("Submitted!");
+         if (userEntry == PASSWORD) {
+          correct++;
+          results.Add("correct");
+        } else {
+          results.Add("incorrect");
+        }
+
+          UnityEngine.Debug.Log("Submitted!");
           attempts++;
-          Debug.Log(correct + "/" + attempts);
+          UnityEngine.Debug.Log(correct + "/" + attempts);
+            UnityEngine.Debug.Log($"Time taken for this attempt: {stopwatch.ElapsedMilliseconds} milliseconds");
+            times.Add(stopwatch.ElapsedMilliseconds);
+            // Reset the stopwatch for the next entry
+   
+            
+           if (attempts == 3) // Check if break is needed
+        {
+            stopwatch.Stop(); // Stop the stopwatch before break
+            StartCoroutine(BreakCoroutine()); // Start the break coroutine
+        }
+        else
+        {
+            // If no break is needed, reset and restart the stopwatch for the next entry
+            stopwatch.Reset();
+            stopwatch.Start();
+        }
         }
 
         userEntry = "";
@@ -193,4 +221,15 @@ public class UIManager: MonoBehaviour {
     }
 
   }
+
+private IEnumerator BreakCoroutine()
+{
+    UnityEngine.Debug.Log("Starting 5-second break...");
+    yield return new WaitForSeconds(5f);
+    UnityEngine.Debug.Log("Break over, resuming...");
+    attempts = 0;
+    stopwatch.Reset();
+    stopwatch.Start();
+}
+
 }
