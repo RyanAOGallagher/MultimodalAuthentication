@@ -63,11 +63,16 @@ public class UIManager: MonoBehaviour {
   public GameObject finishedText;
 
 
+  public string userInput = "";
+  public List < string > userInputList = new List < string > ();
+  public List < GameObject > UIElements = new List < GameObject > ();
+  public List < string > elementsListList = new List < string > ();
 
 
   void Update() {
 
     string latestData = nm.GetLatestData();
+    UnityEngine.Debug.Log(latestData);
     if (!string.IsNullOrEmpty(latestData)) {
       bool shouldUpdateUI = false;
 
@@ -81,6 +86,7 @@ public class UIManager: MonoBehaviour {
 
        
   if (prevList != latestData){
+        elementsListList.Add(latestData);
         elementsList.Clear();
         AddElementsToList(latestData);
         shouldUpdateUI = true;
@@ -97,6 +103,7 @@ public class UIManager: MonoBehaviour {
         } else {
           results.Add("incorrect");
         }
+        userInputList.Add(userInput);
 
           UnityEngine.Debug.Log("Submitted!");
           attempts++;
@@ -108,11 +115,13 @@ public class UIManager: MonoBehaviour {
       
             stopwatch.Stop(); // Stop the stopwatch before break
             StartCoroutine(BreakCoroutine()); // Start the break coroutine
+           
         
      
         }
 
         userEntry = "";
+        userInput = "";
 
       } else if (elementsList.Count == 0) {
         AddElementsToList(latestData);
@@ -120,14 +129,16 @@ public class UIManager: MonoBehaviour {
       }
 
       if (shouldUpdateUI) {
+       
         UpdateUI(); 
 
       }
+      
       prevList = latestData;
         }
         firstAttempt = false;
       }
- if (attempts == 20){
+ if (attempts == 5){
     finishedText.SetActive(true);
     goText.SetActive(false);
     breakText.SetActive(false);
@@ -135,7 +146,8 @@ public class UIManager: MonoBehaviour {
       switch (latestData) {
 
       case "OK":
-         goText.SetActive(false);
+       
+        goText.SetActive(false);
         elementsList.Clear();
         userEntry = "";
         attempts++;
@@ -153,7 +165,6 @@ public class UIManager: MonoBehaviour {
 
         break;
       case "<-":
-      
         if (!string.IsNullOrEmpty(userEntry)) {
           if (prevRem != latestData) {
             prevRem = latestData;
@@ -164,6 +175,7 @@ public class UIManager: MonoBehaviour {
    
         }
          if (latestData != prevList){
+          userInput = userInput+ "D";
           UpdateUI();
           }
          prevList = latestData;
@@ -171,6 +183,7 @@ public class UIManager: MonoBehaviour {
 
       case "cancel":
       if (latestData != prevList){
+        userInput = userInput+ "C";
           UpdateUI();
           }
           prevList = latestData;
@@ -184,6 +197,7 @@ public class UIManager: MonoBehaviour {
 
           if (quadrant == "") {
             quadrant = latestData[latestData.Length - 1] + "";
+                      userInput = userInput+ "Q"+quadrant;
             if (quadrant == "3") {
               topLeft = "";
               topRight = elementsList[10];
@@ -220,10 +234,11 @@ public class UIManager: MonoBehaviour {
           if (previousData != latestData) {
             previousData = latestData;
             if (userEntry.Length <4){
-            userEntry += number.ToString();//////////////////////////////////////////////////////////////////
+            userEntry += number.ToString();
 
          
             }
+            userInput = userInput+ number.ToString();
             UpdateUI();
           }
 
@@ -304,8 +319,14 @@ private IEnumerator BreakCoroutine()
     UnityEngine.Debug.Log("Starting 3-second break...");
     breakText.SetActive(true);
     goText.SetActive(false);
+    foreach(GameObject UIElement in UIElements) {
+    UIElement.SetActive(false);
+    }
     yield return new WaitForSeconds(3f);
     UnityEngine.Debug.Log("Break over, resuming...");
+     foreach(GameObject UIElement in UIElements) {
+    UIElement.SetActive(true);
+    }
     breakText.SetActive(false);
     goText.SetActive(true);
     stopwatch.Reset();
@@ -324,7 +345,7 @@ void OnApplicationQuit()
         // Assuming times and results have the same count
         for (int i = 0; i < times.Count; i++)
         {
-            csvContent.AppendLine(times[i] + "," + results[i]);
+            csvContent.AppendLine(times[i] + "," + results[i] + "," + userInputList[i] + ',' + elementsListList[i]);
         }
 
         string filePath = Path.Combine(Application.persistentDataPath, "data.csv");
