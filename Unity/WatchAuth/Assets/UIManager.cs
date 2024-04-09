@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 using System.Diagnostics;
+using System.Text;
+using System.IO;
 
 public class UIManager: MonoBehaviour {
 
@@ -29,14 +31,37 @@ public class UIManager: MonoBehaviour {
   public string bottomLeft;
   public string bottomRight;
 
+  public Transform one;
+  public Transform two;
+  public Transform three;
+  public Transform four;
+  public Transform five;
+  public Transform six;
+  public Transform seven;
+  public Transform eight;
+  public Transform nine;
+  public Transform ten;
+  public Transform eleven;
+  public Transform twelve;
+
+
   public List < string > elementsList = new List < string > ();
 
   private string previousData;
   private string prevRem;
+  string prevList;
+  public bool firstAttempt = true;
 
   private List < GameObject > instantiatedButtons = new List < GameObject > ();
+  private List < GameObject > instantiatedInnerButtons = new List < GameObject > ();
   public List <float> times = new List <float>();
   public List <string> results = new List <string>();
+
+  public GameObject loadText;
+  public GameObject goText;
+  public GameObject breakText;
+  public GameObject finishedText;
+
 
 
 
@@ -50,16 +75,22 @@ public class UIManager: MonoBehaviour {
         if (!stopwatch.IsRunning)
             {
                 stopwatch.Start();
+                
+                loadText.SetActive(false);
             }
+
+       
+  if (prevList != latestData){
         elementsList.Clear();
         AddElementsToList(latestData);
-        shouldUpdateUI = true; 
-       
-
+        shouldUpdateUI = true;
+        goText.SetActive(true);
 
      
+ if (!firstAttempt){
+  
  
-    if (userEntry.Length > 0) {
+    if (userEntry.Length >= 0) {
          if (userEntry == PASSWORD) {
           correct++;
           results.Add("correct");
@@ -74,18 +105,11 @@ public class UIManager: MonoBehaviour {
             times.Add(stopwatch.ElapsedMilliseconds);
             // Reset the stopwatch for the next entry
    
-            
-           if (attempts == 3) // Check if break is needed
-        {
+      
             stopwatch.Stop(); // Stop the stopwatch before break
             StartCoroutine(BreakCoroutine()); // Start the break coroutine
-        }
-        else
-        {
-            // If no break is needed, reset and restart the stopwatch for the next entry
-            stopwatch.Reset();
-            stopwatch.Start();
-        }
+        
+     
         }
 
         userEntry = "";
@@ -99,11 +123,19 @@ public class UIManager: MonoBehaviour {
         UpdateUI(); 
 
       }
-
+      prevList = latestData;
+        }
+        firstAttempt = false;
+      }
+ if (attempts == 20){
+    finishedText.SetActive(true);
+    goText.SetActive(false);
+    breakText.SetActive(false);
+  }
       switch (latestData) {
 
       case "OK":
-
+         goText.SetActive(false);
         elementsList.Clear();
         userEntry = "";
         attempts++;
@@ -121,52 +153,68 @@ public class UIManager: MonoBehaviour {
 
         break;
       case "<-":
+      
         if (!string.IsNullOrEmpty(userEntry)) {
           if (prevRem != latestData) {
             prevRem = latestData;
             userEntry = userEntry.Substring(0, userEntry.Length - 1);
           }
-          UpdateUI();
+         
+
+   
         }
+         if (latestData != prevList){
+          UpdateUI();
+          }
+         prevList = latestData;
         break;
 
       case "cancel":
-        UpdateUI();
+      if (latestData != prevList){
+          UpdateUI();
+          }
+          prevList = latestData;
         break;
 
       default:
         if (latestData.Contains("quadrant")) {
           previousData = latestData;
           prevRem = latestData;
+          prevList = latestData;
 
           if (quadrant == "") {
             quadrant = latestData[latestData.Length - 1] + "";
             if (quadrant == "3") {
               topLeft = "";
-              topRight = elementsList[8];
+              topRight = elementsList[10];
               bottomRight = elementsList[9];
-              bottomLeft = elementsList[10];
+              bottomLeft = elementsList[8];
             } else if (quadrant == "0") {
-              topLeft = elementsList[1];
+              topLeft = elementsList[11];
               topRight = "";
-              bottomRight = elementsList[11];
+              bottomRight = elementsList[1];
               bottomLeft = elementsList[0];
             } else if (quadrant == "1") {
-              topLeft = elementsList[4];
+              topLeft = elementsList[3];
               topRight = elementsList[2];
               bottomRight = "";
-              bottomLeft = elementsList[3];
+              bottomLeft = elementsList[4];
             } else if (quadrant == "2") {
               topLeft = elementsList[7];
-              topRight = elementsList[5];
-              bottomRight = elementsList[6];
+              topRight = elementsList[6];
+              bottomRight = elementsList[5];
               bottomLeft = "";
             }
-
-            CreateButtonAtPosition(TL, topLeft);
-            CreateButtonAtPosition(TR, topRight);
-            CreateButtonAtPosition(BR, bottomRight);
-            CreateButtonAtPosition(BL, bottomLeft);
+             if (instantiatedButtons.Count > 0) {
+      foreach(GameObject button in instantiatedButtons) {
+        Destroy(button);
+      }
+      instantiatedButtons.Clear();
+    }
+            CreateInnerButtonAtPosition(TL, topLeft);
+            CreateInnerButtonAtPosition(TR, topRight);
+            CreateInnerButtonAtPosition(BR, bottomRight);
+            CreateInnerButtonAtPosition(BL, bottomLeft);
           }
         } else if (int.TryParse(latestData, out int number)) {
           if (previousData != latestData) {
@@ -174,8 +222,9 @@ public class UIManager: MonoBehaviour {
             if (userEntry.Length <4){
             userEntry += number.ToString();//////////////////////////////////////////////////////////////////
 
-            UpdateUI();
+         
             }
+            UpdateUI();
           }
 
         }
@@ -208,28 +257,81 @@ public class UIManager: MonoBehaviour {
     }
   }
 
+  void CreateInnerButtonAtPosition(Transform position, string buttonText) {
+    GameObject buttonObj = Instantiate(buttonPrefab, position.position, Quaternion.identity, position);
+    instantiatedInnerButtons.Add(buttonObj);
+    Text textComponent = buttonObj.GetComponentInChildren <Text> ();
+    if (textComponent != null) {
+      textComponent.text = buttonText;
+    }
+  }
+
   void UpdateUI() {
+      UnityEngine.Debug.Log("UI update");
+
+        CreateButtonAtPosition(one, elementsList[0]);
+        CreateButtonAtPosition(two, elementsList[1]);
+        CreateButtonAtPosition(three, elementsList[2]);
+        CreateButtonAtPosition(four, elementsList[3]);
+        CreateButtonAtPosition(five, elementsList[4]);
+        CreateButtonAtPosition(six, elementsList[5]);
+        CreateButtonAtPosition(seven, elementsList[6]);
+        CreateButtonAtPosition(eight, elementsList[7]);
+        CreateButtonAtPosition(nine, elementsList[8]);
+        CreateButtonAtPosition(ten, elementsList[9]);
+        CreateButtonAtPosition(eleven, elementsList[10]);
+        CreateButtonAtPosition(twelve, elementsList[11]);
+    
     if (userEntryText != null) {
       userEntryText.text = userEntry;
     }
     quadrant = "";
-    if (instantiatedButtons.Count > 0) {
-      foreach(GameObject button in instantiatedButtons) {
+    if (instantiatedInnerButtons.Count > 0) {
+      foreach(GameObject button in instantiatedInnerButtons) {
         Destroy(button);
       }
-      instantiatedButtons.Clear();
+      instantiatedInnerButtons.Clear();
     }
 
   }
 
+
+
+
+
 private IEnumerator BreakCoroutine()
 {
-    UnityEngine.Debug.Log("Starting 5-second break...");
-    yield return new WaitForSeconds(5f);
+    UnityEngine.Debug.Log("Starting 3-second break...");
+    breakText.SetActive(true);
+    goText.SetActive(false);
+    yield return new WaitForSeconds(3f);
     UnityEngine.Debug.Log("Break over, resuming...");
-    attempts = 0;
+    breakText.SetActive(false);
+    goText.SetActive(true);
     stopwatch.Reset();
     stopwatch.Start();
 }
+
+void OnApplicationQuit()
+    {
+        SaveDataToCSV();
+    }
+
+    void SaveDataToCSV()
+    {
+        StringBuilder csvContent = new StringBuilder();
+
+        // Assuming times and results have the same count
+        for (int i = 0; i < times.Count; i++)
+        {
+            csvContent.AppendLine(times[i] + "," + results[i]);
+        }
+
+        string filePath = Path.Combine(Application.persistentDataPath, "data.csv");
+        File.WriteAllText(filePath, csvContent.ToString());
+
+        UnityEngine.Debug.Log("Data saved to " + filePath);
+    }
+    
 
 }
