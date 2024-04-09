@@ -13,7 +13,6 @@ public class NetworkManager : MonoBehaviour
     static UdpClient snd;
     static UdpClient srv_points;
     Thread thread;
-    Thread thread2;
     IPEndPoint remoteEP;
     IPEndPoint remoteEP_pt;
     static private AsyncCallback AC;
@@ -62,7 +61,24 @@ public class NetworkManager : MonoBehaviour
 }
 
 
-
+void OnApplicationQuit()
+    {
+        if(thread != null && thread.IsAlive){
+            thread.Abort(); // Force the thread to stop
+        }
+        CloseUdpClients();
+    }
    
-   
+    void CloseUdpClients()
+    {
+        if (srv != null){
+            srv.Close();
+        }
+        if (snd != null){
+            snd.Close();
+        }
+        if (srv_points != null){
+            srv_points.Close();
+        }
+    }
 }

@@ -46,13 +46,18 @@ public class UIManager: MonoBehaviour {
         elementsList.Clear();
         AddElementsToList(latestData);
         shouldUpdateUI = true; 
-        if (userEntry.Length > 0) {
-          Debug.Log("Submitted!");
-        }
+       
 
 
         if (userEntry == PASSWORD) {
           Debug.Log("Correct");
+          correct++;
+        } 
+ 
+    if (userEntry.Length > 0) {
+          Debug.Log("Submitted!");
+          attempts++;
+          Debug.Log(correct + "/" + attempts);
         }
 
         userEntry = "";
