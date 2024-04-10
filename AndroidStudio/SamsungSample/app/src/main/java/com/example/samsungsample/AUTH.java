@@ -44,6 +44,11 @@ public class AUTH extends Activity {
                 return true;
 
             case MotionEvent.ACTION_MOVE:
+                new Thread(() -> {
+                    MainActivity.sendData("p," + String.valueOf(x) + "," + String.valueOf(y), 5556);
+
+                }).start();
+                Log.d("pointValue", String.valueOf(x));
                 touchedCenter = auth_view.isTouchInCenterRegion(x,y);
                 auth_view.center_touched = touchedCenter;
                 if (auth_view.getBezelArea(x, y) != -1){
