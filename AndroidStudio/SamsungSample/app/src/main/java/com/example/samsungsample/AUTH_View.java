@@ -115,34 +115,36 @@ public class AUTH_View extends View {
         secondLevelElements.clear();
         vibrate();
 
-        int emptyIndex;
-        switch (quadrant) {
-            case 0:
-                emptyIndex = 0;
-                break;
-            case 1:
-                emptyIndex = 1;
-                break;
-            case 2:
-                emptyIndex = 2;
-                break;
-            case 3:
-                emptyIndex = 3;
-                break;
-            default:
-                emptyIndex = 0;
+        // Define the order for each quadrant
+        int[][] orders = {
+                {2, 1, 0}, // Order for quadrant 0
+                {0, 2, 1}, // Order for quadrant 1
+                {1, 0, 2}, // Order for quadrant 2
+                {2, 1, 0}  // Order for quadrant 3
+        };
+
+        // Default quadrant handling
+        if (quadrant < 0 || quadrant >= orders.length) {
+            quadrant = 0; // or handle error
         }
-        for (int i = 0; i < 3; i++) {
-            int elementIndex = (quadrant * 3 + i) % elements.size();
+
+        int[] order = orders[quadrant];
+
+        for (int i = 0; i < order.length; i++) {
+            int elementIndex = (quadrant * 3 + order[i]) % elements.size();
             if (elementIndex == 0) {
                 elementIndex = 12;
             }
             secondLevelElements.add(elements.get(elementIndex - 1));
         }
+
+        // Find the position to insert the empty space
+        int emptyIndex = quadrant;
         secondLevelElements.add(emptyIndex, " ");
         center_touched = true;
         invalidate();
     }
+
 
 
     public boolean isTouchInCenterRegion(float x, float y) {
