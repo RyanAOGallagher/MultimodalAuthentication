@@ -23,6 +23,7 @@ public class UIManager: MonoBehaviour {
   public Transform BR;
   public GameObject buttonPrefab;
   public TextMeshProUGUI userEntryText; // TextMeshPro field
+  public GameObject cursor;
 
   public string userEntry = "";
   public string quadrant = "";
@@ -318,6 +319,7 @@ private IEnumerator BreakCoroutine()
     UnityEngine.Debug.Log("Starting 3-second break...");
     breakText.SetActive(true);
     goText.SetActive(false);
+    cursor.SetActive(false);
     foreach(GameObject UIElement in UIElements) {
     UIElement.SetActive(false);
     }
@@ -328,6 +330,7 @@ private IEnumerator BreakCoroutine()
     }
     breakText.SetActive(false);
     goText.SetActive(true);
+    cursor.SetActive(true);
     stopwatch.Reset();
     stopwatch.Start();
 }
