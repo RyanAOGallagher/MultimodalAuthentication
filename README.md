@@ -28,5 +28,3 @@ The Android app is developed with:
 
 - **Android Studio Version:** Iguana | 2023.2.1 Patch 1
 - **Runtime Version:** 17.0.9+0--11185874 amd64
-
-## Getting Started
