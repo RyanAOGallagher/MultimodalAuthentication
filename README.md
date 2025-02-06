@@ -1,4 +1,11 @@
-# Watch Authentication
+# **HMD & Smartwatch Multimodal Authentication**  
+
+This project implements a **multimodal authentication system** using a **Head-Mounted Display (HMD)** and a **smartwatch**. Users authenticate by viewing a **randomly generated PIN** on the HMD and entering it through **swipe gestures on a smartwatch**.
+
+## **Features**
+- **Multimodal Input** – Combines **visual (HMD)** and **gestural (smartwatch)** interaction for authentication.
+- **Networked Communication** – Uses **Python & Unity** for seamless data exchange.
+- **Cross-Platform Support** – Works with **Android (smartwatch app), Unity (HMD), and Python (backend networking).**
 
 ## Unity
 
